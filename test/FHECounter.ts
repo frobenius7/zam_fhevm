@@ -57,20 +57,42 @@ describe("FHECounter", function () {
       .add32(clearOne)
       .encrypt();
 
-    // const tx = await counterContract.connect(signers.alice).increment(1);
-    // await tx.wait();
-    // const countAfterInc = await counterContract.getCount();
-    // expect(countAfterInc).to.eq(countBeforeInc + 1n);
+      const tx = await fheCounterContract.connect(signers.alice).increment(encryptedOne.handles[0], encryptedOne.inputProof);
+      await tx.wait();
+      const encryptedCountAfterInc = await fheCounterContract.getCount();
+      const clearCountAfterInc = await fhevm.userDecryptEuint(
+        FhevmType.euint32,
+        encryptedCountAfterInc,
+        fheCounterContractAddress,
+        signers.alice,
+      );
+      expect(clearCountAfterInc).to.eq(clearCountBeforeInc + clearOne);
   });
 
-  //   it("decrement the counter by 1", async function () {
-  //     // First increment, count becomes 1
-  //     let tx = await counterContract.connect(signers.alice).increment();
-  //     await tx.wait();
-  //     // Then decrement, count goes back to 0
-  //     tx = await counterContract.connect(signers.alice).decrement(1);
-  //     await tx.wait();
-  //     const count = await counterContract.getCount();
-  //     expect(count).to.eq(0);
-  //   });
+it("decrement the counter by 1", async function () {
+  // Encrypt constant 1 as a euint32
+  const clearOne = 1;
+  const encryptedOne = await fhevm
+    .createEncryptedInput(fheCounterContractAddress, signers.alice.address)
+    .add32(clearOne)
+    .encrypt();
+
+  // First increment by 1, count becomes 1
+  let tx = await fheCounterContract.connect(signers.alice).increment(encryptedOne.handles[0], encryptedOne.inputProof);
+  await tx.wait();
+
+  // Then decrement by 1, count goes back to 0
+  tx = await fheCounterContract.connect(signers.alice).decrement(encryptedOne.handles[0], encryptedOne.inputProof);
+  await tx.wait();
+
+  const encryptedCountAfterDec = await fheCounterContract.getCount();
+  const clearCountAfterDec = await fhevm.userDecryptEuint(
+    FhevmType.euint32,
+    encryptedCountAfterDec,
+    fheCounterContractAddress,
+    signers.alice,
+  );
+
+  expect(clearCountAfterDec).to.eq(0);
+});
 });
