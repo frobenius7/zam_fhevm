@@ -22,7 +22,7 @@ contract FHECounter is SepoliaConfig {
         _count = FHE.add(_count, encryptedEuint32);
 
         FHE.allowThis(_count);
-        FHE.allow(_count, msg.sender);
+        FHE.allow(_count, msg.sender); 
     }
 
     /// @notice Decrements the counter by a specified encrypted value.
