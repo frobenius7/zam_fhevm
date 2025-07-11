@@ -79,7 +79,7 @@ it("decrement the counter by 1", async function () {
 
   // First increment by 1, count becomes 1
   let tx = await fheCounterContract.connect(signers.alice).increment(encryptedOne.handles[0], encryptedOne.inputProof);
-  await tx.wait();
+  await tx.wait(); 
 
   // Then decrement by 1, count goes back to 0
   tx = await fheCounterContract.connect(signers.alice).decrement(encryptedOne.handles[0], encryptedOne.inputProof);
